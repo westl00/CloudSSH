@@ -3,6 +3,8 @@ import {
   SSH_MSG_KEXINIT,
   SSH_MSG_NEWKEYS,
   SSH_MSG_KEX_ECDH_REPLY,
+  SSH_MSG_SERVICE_REQUEST,
+  SSH_MSG_SERVICE_ACCEPT,
   SSH_MSG_USERAUTH_SUCCESS,
   SSH_MSG_USERAUTH_FAILURE,
   SSH_MSG_CHANNEL_OPEN_CONFIRMATION,
@@ -233,8 +235,8 @@ export class SSHSession {
 
         this.state = 'auth';
         console.log('[SSH] State changed to: auth');
-        this.ws.send(JSON.stringify({ type: 'status', message: '加密已启用，正在认证...' }));
-        await this.authenticate();
+        this.ws.send(JSON.stringify({ type: 'status', message: '加密已启用，正在请求认证服务...' }));
+        await this.sendServiceRequest();
         break;
     }
   }
@@ -293,6 +295,27 @@ export class SSHSession {
     console.log('[KEX] Encryption ciphers ready');
   }
 
+  private async sendServiceRequest(): Promise<void> {
+    console.log('[AUTH] Sending SERVICE_REQUEST for ssh-userauth...');
+    const serviceName = 'ssh-userauth';
+    const encoder = new TextEncoder();
+    const nameBytes = encoder.encode(serviceName);
+    const serviceRequest = new Uint8Array(1 + 4 + nameBytes.length);
+    serviceRequest[0] = SSH_MSG_SERVICE_REQUEST;
+    const view = new DataView(serviceRequest.buffer);
+    view.setUint32(1, nameBytes.length, false);
+    serviceRequest.set(nameBytes, 5);
+
+    const packet = await SSHPacketBuilder.build(
+      serviceRequest, 16,
+      (data, seq) => this.encryptCipher!.encrypt(data, seq),
+      this.seqNumSend++,
+      true
+    );
+    await this.writeSocket(packet);
+    console.log('[AUTH] SERVICE_REQUEST sent');
+  }
+
   private async authenticate(): Promise<void> {
     console.log('[AUTH] Sending password authentication...');
     const authRequest = SSHAuth.buildPasswordAuthRequest(
@@ -313,6 +336,12 @@ export class SSHSession {
 
   private async handleAuthPacket(msgType: number, payload: Uint8Array): Promise<void> {
     switch (msgType) {
+      case SSH_MSG_SERVICE_ACCEPT:
+        console.log('[AUTH] SERVICE_ACCEPT received, sending password auth...');
+        this.ws.send(JSON.stringify({ type: 'status', message: '认证服务已接受，正在认证...' }));
+        await this.authenticate();
+        break;
+
       case SSH_MSG_USERAUTH_SUCCESS:
         console.log('[AUTH] Authentication successful!');
         this.ws.send(JSON.stringify({
