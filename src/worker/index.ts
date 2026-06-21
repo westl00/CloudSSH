@@ -244,6 +244,10 @@ export default {
       });
     }
 
+    if (url.pathname.startsWith('/api/')) {
+      return Response.json({ error: 'API route not found' }, { status: 404 });
+    }
+
     return new Response(HTML, {
       headers: {
         'Content-Type': 'text/html;charset=UTF-8',

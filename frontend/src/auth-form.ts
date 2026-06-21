@@ -1,3 +1,4 @@
+import { readJsonResponse } from './api';
 import { SSHTerminal } from './terminal';
 
 // --- Credential encryption helpers ---
@@ -59,12 +60,12 @@ export class ConnectionForm {
   private async checkTurnstileConfig(): Promise<void> {
     try {
       const response = await fetch('/api/config');
-      const config = (await response.json()) as {
+      const config = await readJsonResponse<{
         turnstileEnabled: boolean;
         sitekey: string;
         githubAuthEnabled: boolean;
         anonymousSshEnabled?: boolean;
-      };
+      }>(response, 'Failed to load app config');
       this.turnstileEnabled = config.turnstileEnabled;
       this.turnstileSitekey = config.sitekey;
       this.anonymousSshEnabled = config.anonymousSshEnabled !== false;
@@ -137,7 +138,7 @@ export class ConnectionForm {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token }),
           });
-          const result = (await response.json()) as { success: boolean };
+          const result = await readJsonResponse<{ success: boolean }>(response, 'Turnstile verification failed');
           if (result.success) {
             this.turnstileVerified = true;
             // Hide Turnstile widget after successful verification

@@ -1,3 +1,4 @@
+import { readJsonResponse } from './api';
 import { SSHTerminal } from './terminal';
 import { ConnectionForm } from './auth-form';
 import { ServerList } from './server-list';
@@ -136,7 +137,7 @@ async function init(): Promise<void> {
     // 检查是否已登录
     const meRes = await fetch('/api/auth/me');
     if (meRes.ok) {
-      const user = await meRes.json();
+      const user = await readJsonResponse<{ id: number; github_id: number; username: string; avatar_url: string }>(meRes, 'Failed to load current user');
       showUserSpace(user);
       return;
     }

@@ -1,3 +1,4 @@
+import { fetchJson, readJsonResponse } from './api';
 import { SSHTerminal } from './terminal';
 
 interface UserInfo {
@@ -105,9 +106,7 @@ export class ServerList {
 
   private async fetchServers(): Promise<void> {
     try {
-      const res = await fetch('/api/servers');
-      if (!res.ok) throw new Error('Failed to fetch servers');
-      this.servers = await res.json();
+      this.servers = await fetchJson<ServerConfig[]>('/api/servers', undefined, 'Failed to fetch servers');
       this.renderServerGrid();
     } catch (e) {
       console.error('Failed to fetch servers:', e);
@@ -207,16 +206,9 @@ export class ServerList {
     }
 
     try {
-      const res = await fetch(`/api/servers/${serverId}/connect`, {
+      const { wsUrl } = await fetchJson<{ wsUrl: string }>(`/api/servers/${serverId}/connect`, {
         method: 'POST',
-      });
-
-      if (!res.ok) {
-        const err = await res.json() as { error?: string };
-        throw new Error(err.error || 'Connection failed');
-      }
-
-      const { wsUrl } = await res.json() as { wsUrl: string };
+      }, 'Connection failed');
       this.onConnect(wsUrl, server.name);
 
       // Restore the button after switching to the terminal view.
@@ -250,11 +242,9 @@ export class ServerList {
       const card = document.getElementById(`card-${serverId}`);
       if (card) card.classList.add('removing');
 
-      const res = await fetch(`/api/servers/${serverId}`, {
+      await fetchJson<{ success: boolean }>(`/api/servers/${serverId}`, {
         method: 'DELETE',
-      });
-
-      if (!res.ok) throw new Error('Delete failed');
+      }, 'Delete failed');
 
       // Wait for the removal animation to finish
       await new Promise((r) => setTimeout(r, 300));
@@ -396,7 +386,7 @@ export class ServerList {
       }
 
       if (!res.ok) {
-        const err = await res.json() as { error?: string };
+        const err = await readJsonResponse<{ error?: string }>(res, 'Save failed');
         throw new Error(err.error || 'Save failed');
       }
 
