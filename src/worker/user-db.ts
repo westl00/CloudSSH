@@ -13,8 +13,6 @@ export class UserDBDO {
   private state: DurableObjectState;
   private env: Env;
   private db: any; // SqlStorage (DO SQLite)
-  // one-time-token 内存存储：token → { config, expiresAt }
-  private connectTokens: Map<string, { config: any; expiresAt: number }> = new Map();
 
   constructor(state: DurableObjectState, env: Env) {
     this.state = state;
@@ -66,6 +64,13 @@ export class UserDBDO {
         ip          TEXT PRIMARY KEY,
         count       INTEGER NOT NULL DEFAULT 1,
         reset_time  TEXT NOT NULL,
+        created_at  TEXT DEFAULT (datetime('now'))
+      );
+
+      CREATE TABLE IF NOT EXISTS connect_tokens (
+        token       TEXT PRIMARY KEY,
+        config      TEXT NOT NULL,
+        expires_at  INTEGER NOT NULL,
         created_at  TEXT DEFAULT (datetime('now'))
       );
     `);
@@ -378,13 +383,15 @@ export class UserDBDO {
       privateKey: server.auth_method === 'publickey' ? credential : '',
     };
 
-    // 存入内存，60 秒过期
-    this.connectTokens.set(token, {
-      config,
-      expiresAt: Date.now() + 60_000,
-    });
+    const expiresAt = Date.now() + 60_000;
 
-    // 清理过期 token
+    this.db.exec(
+      'INSERT INTO connect_tokens (token, config, expires_at) VALUES (?, ?, ?)',
+      token,
+      JSON.stringify(config),
+      expiresAt
+    );
+
     this.cleanExpiredTokens();
 
     return Response.json({ token });
@@ -393,26 +400,24 @@ export class UserDBDO {
   private async handleConsumeToken(request: Request): Promise<Response> {
     const { token } = await request.json<{ token: string }>();
 
-    const entry = this.connectTokens.get(token);
-    if (!entry) return Response.json({ error: 'Invalid or expired token' }, { status: 404 });
+    const rows = this.db
+      .exec('SELECT config, expires_at FROM connect_tokens WHERE token = ?', token)
+      .toArray();
 
-    // 立即删除（一次性）
-    this.connectTokens.delete(token);
+    if (rows.length === 0) return Response.json({ error: 'Invalid or expired token' }, { status: 404 });
 
-    if (Date.now() > entry.expiresAt) {
+    this.db.exec('DELETE FROM connect_tokens WHERE token = ?', token);
+
+    const entry = rows[0] as { config: string; expires_at: number };
+    if (Number(entry.expires_at) < Date.now()) {
       return Response.json({ error: 'Token expired' }, { status: 410 });
     }
 
-    return Response.json(entry.config);
+    return Response.json(JSON.parse(entry.config));
   }
 
   private cleanExpiredTokens(): void {
-    const now = Date.now();
-    for (const [key, value] of this.connectTokens) {
-      if (now > value.expiresAt) {
-        this.connectTokens.delete(key);
-      }
-    }
+    this.db.exec('DELETE FROM connect_tokens WHERE expires_at < ?', Date.now());
   }
 
   // ==================== 凭据加密 ====================
@@ -450,20 +455,9 @@ export class UserDBDO {
   }
 
   private async deriveEncryptionKey(userId: number): Promise<CryptoKey> {
-    let secret = this.env.SESSION_SECRET;
-
-    // 如果环境变量未设置，则尝试从数据库读取自动生成的密钥，若没有则自动生成并保存
+    const secret = this.env.SESSION_SECRET;
     if (!secret) {
-      const rows = this.db.exec("SELECT value FROM system_config WHERE key = 'session_secret'").toArray();
-      if (rows.length > 0) {
-        secret = rows[0].value as string;
-      } else {
-        const bytes = new Uint8Array(32);
-        crypto.getRandomValues(bytes);
-        secret = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-        this.db.exec("INSERT INTO system_config (key, value) VALUES ('session_secret', ?)", secret);
-        console.log('[UserDBDO] Auto-generated and stored a new SESSION_SECRET');
-      }
+      throw new Error('SESSION_SECRET is required to encrypt stored SSH credentials');
     }
 
     const salt = new TextEncoder().encode(`cloudssh:userdb:${userId}`);
