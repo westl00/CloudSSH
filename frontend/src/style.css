@@ -6,84 +6,68 @@
 
 body {
   font-family: 'JetBrains Mono', monospace;
-  background-color: #0a0a0a;
-  color: #4af626;
+  background-color: #0f172a;
+  color: #e2e8f0;
   min-height: 100vh;
   overflow: hidden;
 }
 
-.scanlines {
-  position: fixed; top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-  background-size: 100% 4px;
-  pointer-events: none; z-index: 50;
-}
-
-.flicker {
-  animation: flicker 0.15s infinite;
-  pointer-events: none; position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(74, 246, 38, 0.02); z-index: 49;
-}
-
-@keyframes flicker {
-  0% { opacity: 0.8; }
-  50% { opacity: 1; }
-  100% { opacity: 0.9; }
+.scanlines,
+.flicker,
+.scanline {
+  display: none;
 }
 
 .terminal-input {
-  background: transparent; border: none;
-  border-bottom: 1px solid #3c4b36; color: #4af626;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
   font-family: 'JetBrains Mono', monospace;
-  padding: 8px 0; width: 100%; outline: none;
+  padding: 8px 0;
+  width: 100%;
+  outline: none;
   transition: border-color 0.2s;
 }
 
 .terminal-input:focus {
-  border-bottom: 1px solid #4af626;
+  border-bottom: 1px solid #3b82f6;
   box-shadow: none;
 }
 
 .terminal-input::placeholder {
-  color: #3c4b36;
+  color: #64748b;
 }
 
 .blinking-cursor::after {
-  content: '\2588'; color: #14d1ff;
-  animation: blink 1s step-end infinite;
-  margin-left: 4px; font-size: 0.9em;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  content: '';
 }
 
 .cyber-box {
-  background-color: #121212;
-  border: 1px solid #1f1f1f;
+  background-color: #111827;
+  border: 1px solid #334155;
+  border-radius: 14px;
 }
 
 .cyber-button {
-  border: 1px solid #4af626; color: #4af626;
-  transition: all 0.2s ease; position: relative; overflow: hidden;
+  border: 1px solid #3b82f6;
+  color: #dbeafe;
+  background-color: transparent;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
   cursor: pointer;
 }
 
 .cyber-button:hover {
-  background-color: #4af626;
-  color: #0a0a0a;
+  background-color: #2563eb;
+  border-color: #60a5fa;
+  color: #ffffff;
 }
 
 .cursor-blink {
-  animation: blink 1s step-end infinite;
-}
-
-.scanline {
-  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-  background-size: 100% 4px;
+  animation: none;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -91,35 +75,35 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(28, 27, 27, 0.5);
+  background: rgba(15, 23, 42, 0.45);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(60, 75, 54, 0.8);
+  background: rgba(71, 85, 105, 0.8);
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(134, 149, 125, 0.8);
+  background: rgba(100, 116, 139, 0.9);
 }
 
 /* ==================== User Space Styles ==================== */
 
-/* 服务器卡片 */
+/* Server cards */
 .server-card {
-  background-color: #121212;
-  border: 1px solid #1f1f1f;
-  transition: all 0.3s ease;
+  background-color: #111827;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  transition: all 0.2s ease;
   position: relative;
 }
 
 .server-card:hover {
-  border-color: #4af626;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(74, 246, 38, 0.08);
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28);
 }
 
-/* 卡片删除动画 */
 .server-card.removing {
   animation: fadeOut 0.3s ease forwards;
 }
@@ -131,34 +115,30 @@ body {
   }
 }
 
-/* Modal 遮罩 */
 .modal-overlay {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(15, 23, 42, 0.78);
   backdrop-filter: blur(4px);
 }
 
-/* 用户头像 */
 .user-avatar {
-  border: 2px solid #4af626;
+  border: 2px solid #3b82f6;
   border-radius: 50%;
   transition: border-color 0.2s;
 }
 
 .user-avatar:hover {
-  border-color: #14d1ff;
+  border-color: #60a5fa;
 }
 
-/* GitHub 登录按钮 */
 .github-login-btn {
   transition: all 0.2s ease;
 }
 
 .github-login-btn:hover {
-  border-color: #4af626;
-  color: #4af626;
+  border-color: #3b82f6;
+  color: #3b82f6;
 }
 
-/* 旋转动画 */
 .animate-spin {
   animation: spin 1s linear infinite;
 }

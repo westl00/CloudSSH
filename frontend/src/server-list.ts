@@ -1,4 +1,4 @@
-import { SSHTerminal } from './terminal';
+﻿import { SSHTerminal } from './terminal';
 
 interface UserInfo {
   id: number;
@@ -20,7 +20,7 @@ interface ServerConfig {
 }
 
 /**
- * 用户空间 — 服务器列表管理组件
+ * 鐢ㄦ埛绌洪棿 鈥?鏈嶅姟鍣ㄥ垪琛ㄧ鐞嗙粍浠?
  */
 export class ServerList {
   private user: UserInfo;
@@ -46,12 +46,12 @@ export class ServerList {
     this.bindEvents();
     await this.fetchServers();
 
-    // 设置用户空间的版权年份
+    // 璁剧疆鐢ㄦ埛绌洪棿鐨勭増鏉冨勾浠?
     const yearSpan = document.getElementById('user-copyright-year');
     if (yearSpan) yearSpan.textContent = new Date().getFullYear().toString();
   }
 
-  // ==================== 渲染用户信息 ====================
+  // ==================== 娓叉煋鐢ㄦ埛淇℃伅 ====================
 
   private renderUserInfo(): void {
     const container = document.getElementById('user-info');
@@ -59,32 +59,32 @@ export class ServerList {
 
     container.innerHTML = `
       <img src="${this.user.avatar_url}" alt="${this.user.username}" class="user-avatar w-8 h-8" />
-      <span class="text-xs font-bold tracking-[0.1em] text-[#bbccb0]">${this.user.username}</span>
+      <span class="text-xs font-bold tracking-[0.1em] text-[#94a3b8]">${this.user.username}</span>
     `;
   }
 
-  // ==================== 事件绑定 ====================
+  // ==================== 浜嬩欢缁戝畾 ====================
 
   private bindEvents(): void {
-    // 退出登录
+    // 閫€鍑虹櫥褰?
     document.getElementById('logout-btn')?.addEventListener('click', () => this.logout());
 
-    // 添加服务器按钮
+    // 娣诲姞鏈嶅姟鍣ㄦ寜閽?
     document.getElementById('add-server-btn')?.addEventListener('click', () => this.showModal('add'));
     document.getElementById('empty-add-btn')?.addEventListener('click', () => this.showModal('add'));
 
-    // Modal 关闭
+    // Modal 鍏抽棴
     document.getElementById('modal-close-btn')?.addEventListener('click', () => this.hideModal());
     document.getElementById('modal-backdrop')?.addEventListener('click', () => this.hideModal());
 
-    // Modal 提交
+    // Modal 鎻愪氦
     document.getElementById('server-submit-btn')?.addEventListener('click', () => this.handleSubmit());
 
-    // Modal 认证方式切换
+    // Modal 璁よ瘉鏂瑰紡鍒囨崲
     document.getElementById('modal-auth-tab-password')?.addEventListener('click', () => this.setModalAuthMode('password'));
     document.getElementById('modal-auth-tab-key')?.addEventListener('click', () => this.setModalAuthMode('key'));
 
-    // 回车提交
+    // 鍥炶溅鎻愪氦
     document.getElementById('server-form')?.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -93,7 +93,7 @@ export class ServerList {
     });
   }
 
-  // ==================== 数据获取 ====================
+  // ==================== 鏁版嵁鑾峰彇 ====================
 
   private async fetchServers(): Promise<void> {
     try {
@@ -108,7 +108,7 @@ export class ServerList {
     }
   }
 
-  // ==================== 渲染服务器卡片 ====================
+  // ==================== 娓叉煋鏈嶅姟鍣ㄥ崱鐗?====================
 
   private renderServerGrid(): void {
     const grid = document.getElementById('server-grid');
@@ -129,7 +129,7 @@ export class ServerList {
       .map((server) => this.renderServerCard(server))
       .join('');
 
-    // 绑定卡片事件
+    // 缁戝畾鍗＄墖浜嬩欢
     this.servers.forEach((server) => {
       document.getElementById(`connect-${server.id}`)?.addEventListener('click', () => this.connectServer(server.id));
       document.getElementById(`edit-${server.id}`)?.addEventListener('click', () => this.showModal('edit', server));
@@ -143,26 +143,26 @@ export class ServerList {
 
     return `
       <div class="server-card p-5 relative group" id="card-${server.id}">
-        <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#3c4b36] to-transparent group-hover:via-[#4af626] transition-all duration-300"></div>
+        <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#334155] to-transparent group-hover:via-[#3b82f6] transition-all duration-300"></div>
         
         <div class="flex items-start justify-between mb-3">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[#4af626]" style="font-size: 20px; font-variation-settings: 'FILL' 0;">dns</span>
-            <h3 class="text-sm font-bold text-[#4af626] tracking-[0.05em]">${this.escapeHtml(server.name)}</h3>
+            <span class="material-symbols-outlined text-[#3b82f6]" style="font-size: 20px; font-variation-settings: 'FILL' 0;">dns</span>
+            <h3 class="text-sm font-bold text-[#3b82f6] tracking-[0.05em]">${this.escapeHtml(server.name)}</h3>
           </div>
-          <span class="text-[10px] font-bold tracking-[0.1em] text-[#bbccb0] border border-[#3c4b36] px-2 py-0.5 flex items-center gap-1">
+          <span class="text-[10px] font-bold tracking-[0.1em] text-[#94a3b8] border border-[#334155] px-2 py-0.5 flex items-center gap-1">
             <span class="material-symbols-outlined" style="font-size: 12px;">${authIcon}</span>
             ${authLabel}
           </span>
         </div>
 
-        <div class="space-y-1.5 text-xs text-[#bbccb0] mb-4">
+        <div class="space-y-1.5 text-xs text-[#94a3b8] mb-4">
           <div class="flex items-center gap-2">
-            <span class="text-[#3c4b36]">HOST</span>
+            <span class="text-[#334155]">HOST</span>
             <span class="text-[#e5e2e1]">${this.escapeHtml(server.host)}:${server.port}</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-[#3c4b36]">USER</span>
+            <span class="text-[#334155]">USER</span>
             <span class="text-[#e5e2e1]">${this.escapeHtml(server.username)}</span>
           </div>
         </div>
@@ -175,7 +175,7 @@ export class ServerList {
           <button id="edit-${server.id}" class="cyber-button py-1.5 px-3 text-[10px] font-bold tracking-[0.1em] flex items-center justify-center" title="Edit">
             <span class="material-symbols-outlined" style="font-size: 14px;">edit</span>
           </button>
-          <button id="delete-${server.id}" class="cyber-button py-1.5 px-3 text-[10px] font-bold tracking-[0.1em] flex items-center justify-center text-[#ffb4ab] border-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#0a0a0a]" title="Delete">
+          <button id="delete-${server.id}" class="cyber-button py-1.5 px-3 text-[10px] font-bold tracking-[0.1em] flex items-center justify-center text-[#ffb4ab] border-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#0f172a]" title="Delete">
             <span class="material-symbols-outlined" style="font-size: 14px;">delete</span>
           </button>
         </div>
@@ -183,7 +183,7 @@ export class ServerList {
     `;
   }
 
-  // ==================== 服务器操作 ====================
+  // ==================== 鏈嶅姟鍣ㄦ搷浣?====================
 
   private async connectServer(serverId: number): Promise<void> {
     const server = this.servers.find((s) => s.id === serverId);
@@ -211,7 +211,7 @@ export class ServerList {
       const { wsUrl } = await res.json() as { wsUrl: string };
       this.onConnect(wsUrl, server.name);
 
-      // 连接成功跳转终端后，立即恢复按钮的原始状态，以便用户断开连接返回后看到的是正常按钮
+      // 杩炴帴鎴愬姛璺宠浆缁堢鍚庯紝绔嬪嵆鎭㈠鎸夐挳鐨勫師濮嬬姸鎬侊紝浠ヤ究鐢ㄦ埛鏂紑杩炴帴杩斿洖鍚庣湅鍒扮殑鏄甯告寜閽?
       if (connectBtn) {
         connectBtn.innerHTML = `
           <span class="material-symbols-outlined" style="font-size: 14px;">power_settings_new</span>
@@ -220,8 +220,8 @@ export class ServerList {
         (connectBtn as HTMLButtonElement).disabled = false;
       }
     } catch (e) {
-      alert(`连接失败: ${e instanceof Error ? e.message : String(e)}`);
-      // 恢复按钮状态
+      alert(`杩炴帴澶辫触: ${e instanceof Error ? e.message : String(e)}`);
+      // 鎭㈠鎸夐挳鐘舵€?
       if (connectBtn) {
         connectBtn.innerHTML = `
           <span class="material-symbols-outlined" style="font-size: 14px;">power_settings_new</span>
@@ -236,7 +236,7 @@ export class ServerList {
     const server = this.servers.find((s) => s.id === serverId);
     if (!server) return;
 
-    if (!confirm(`确认删除服务器 "${server.name}" ?`)) return;
+    if (!confirm(`纭鍒犻櫎鏈嶅姟鍣?"${server.name}" ?`)) return;
 
     try {
       const card = document.getElementById(`card-${serverId}`);
@@ -248,17 +248,17 @@ export class ServerList {
 
       if (!res.ok) throw new Error('Delete failed');
 
-      // 等待动画完成后移除
+      // 绛夊緟鍔ㄧ敾瀹屾垚鍚庣Щ闄?
       await new Promise((r) => setTimeout(r, 300));
       this.servers = this.servers.filter((s) => s.id !== serverId);
       this.renderServerGrid();
     } catch (e) {
-      alert(`删除失败: ${e instanceof Error ? e.message : String(e)}`);
+      alert(`鍒犻櫎澶辫触: ${e instanceof Error ? e.message : String(e)}`);
       await this.fetchServers();
     }
   }
 
-  // ==================== Modal 操作 ====================
+  // ==================== Modal 鎿嶄綔 ====================
 
   showModal(mode: 'add' | 'edit', server?: ServerConfig): void {
     this.editingServerId = mode === 'edit' && server ? server.id : null;
@@ -268,13 +268,13 @@ export class ServerList {
     const submitBtn = document.getElementById('server-submit-btn');
     if (!modal || !title || !submitBtn) return;
 
-    title.textContent = mode === 'add' ? 'ADD_SERVER' : 'EDIT_SERVER';
+    title.textContent = mode === 'add' ? 'Add Server' : 'EDIT_SERVER';
     submitBtn.innerHTML = `
       <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
-      ${mode === 'add' ? 'SAVE_SERVER' : 'UPDATE_SERVER'}
+      ${mode === 'add' ? 'Save server' : 'UPDATE_SERVER'}
     `;
 
-    // 填充表单
+    // 濉厖琛ㄥ崟
     if (mode === 'edit' && server) {
       (document.getElementById('server-name') as HTMLInputElement).value = server.name;
       (document.getElementById('server-host') as HTMLInputElement).value = server.host;
@@ -289,7 +289,7 @@ export class ServerList {
         this.setModalAuthMode('password');
       }
     } else {
-      // 清空表单
+      // 娓呯┖琛ㄥ崟
       (document.getElementById('server-name') as HTMLInputElement).value = '';
       (document.getElementById('server-host') as HTMLInputElement).value = '';
       (document.getElementById('server-port') as HTMLInputElement).value = '22';
@@ -302,7 +302,7 @@ export class ServerList {
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 
-    // 聚焦第一个输入框
+    // 鑱氱劍绗竴涓緭鍏ユ
     setTimeout(() => {
       (document.getElementById('server-name') as HTMLInputElement)?.focus();
     }, 100);
@@ -325,16 +325,16 @@ export class ServerList {
     const keySection = document.getElementById('modal-key-section')!;
 
     if (mode === 'password') {
-      pwTab.style.background = '#4af626'; pwTab.style.color = '#0a0a0a';
-      pwTab.style.borderColor = '#4af626';
-      keyTab.style.background = 'transparent'; keyTab.style.color = '#bbccb0';
-      keyTab.style.borderColor = '#3c4b36';
+      pwTab.style.background = '#3b82f6'; pwTab.style.color = '#0f172a';
+      pwTab.style.borderColor = '#3b82f6';
+      keyTab.style.background = 'transparent'; keyTab.style.color = '#94a3b8';
+      keyTab.style.borderColor = '#334155';
       pwSection.style.display = ''; keySection.style.display = 'none';
     } else {
-      keyTab.style.background = '#4af626'; keyTab.style.color = '#0a0a0a';
-      keyTab.style.borderColor = '#4af626';
-      pwTab.style.background = 'transparent'; pwTab.style.color = '#bbccb0';
-      pwTab.style.borderColor = '#3c4b36';
+      keyTab.style.background = '#3b82f6'; keyTab.style.color = '#0f172a';
+      keyTab.style.borderColor = '#3b82f6';
+      pwTab.style.background = 'transparent'; pwTab.style.color = '#94a3b8';
+      pwTab.style.borderColor = '#334155';
       keySection.style.display = ''; pwSection.style.display = 'none';
     }
   }
@@ -355,7 +355,7 @@ export class ServerList {
     const authMethod = this.modalAuthMode === 'key' ? 'publickey' : 'password';
     const credential = authMethod === 'publickey' ? privateKey : password;
 
-    // 新增时必须填写凭据，编辑时可选
+    // 新增时必须填写凭据，编辑时可留空
     if (!this.editingServerId && !credential) {
       alert(authMethod === 'publickey' ? '请粘贴私钥内容' : '请输入密码');
       return;
@@ -395,28 +395,28 @@ export class ServerList {
       this.hideModal();
       await this.fetchServers();
     } catch (e) {
-      alert(`保存失败: ${e instanceof Error ? e.message : String(e)}`);
+      alert(`淇濆瓨澶辫触: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       submitBtn.disabled = false;
       submitBtn.innerHTML = `
         <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
-        ${this.editingServerId ? 'UPDATE_SERVER' : 'SAVE_SERVER'}
+        ${this.editingServerId ? 'UPDATE_SERVER' : 'Save server'}
       `;
     }
   }
 
-  // ==================== 退出登录 ====================
+  // ==================== 閫€鍑虹櫥褰?====================
 
   private async logout(): Promise<void> {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch {
-      // 即使请求失败也清除本地状态
+      // 鍗充娇璇锋眰澶辫触涔熸竻闄ゆ湰鍦扮姸鎬?
     }
     this.onLogout();
   }
 
-  // ==================== 工具函数 ====================
+  // ==================== 宸ュ叿鍑芥暟 ====================
 
   private escapeHtml(text: string): string {
     const div = document.createElement('div');

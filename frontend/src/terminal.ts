@@ -1,4 +1,4 @@
-import { Terminal } from '@xterm/xterm';
+﻿import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { WebglAddon } from '@xterm/addon-webgl';
@@ -15,11 +15,11 @@ export interface SSHConnectionConfig {
 }
 
 export const THEMES = {
-  cyberpunk: {
-    background: '#0a0a0a',
-    foreground: '#4af626',
-    cursor: '#14d1ff',
-    cursorAccent: '#0a0a0a',
+  default: {
+    background: '#0f172a',
+    foreground: '#3b82f6',
+    cursor: '#60a5fa',
+    cursorAccent: '#0f172a',
     selectionBackground: '#273747',
   },
   glacier: {
@@ -59,7 +59,7 @@ export class SSHTerminal {
       cursorStyle: 'block',
       fontSize: 14,
       fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", monospace',
-      theme: THEMES.cyberpunk,
+      theme: THEMES.default,
       allowProposedApi: true,
       scrollback: 10000,
     });
@@ -105,9 +105,9 @@ export class SSHTerminal {
 
     this.fit();
 
-    this.terminal.writeln('\x1b[1;33m╔══════════════════════════════════╗\x1b[0m');
-    this.terminal.writeln('\x1b[1;33m║      Connecting to CloudSSH      ║\x1b[0m');
-    this.terminal.writeln('\x1b[1;33m╚══════════════════════════════════╝\x1b[0m');
+    this.terminal.writeln('\x1b[1;33m鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽\x1b[0m');
+    this.terminal.writeln('\x1b[1;33m鈺?     Connecting to CloudSSH      鈺慭x1b[0m');
+    this.terminal.writeln('\x1b[1;33m鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆\x1b[0m');
     this.terminal.writeln('');
   }
 
@@ -141,7 +141,7 @@ export class SSHTerminal {
       };
 
       this.ws.onclose = () => {
-        this.terminal.writeln('\x1b[31m[-] 连接已关闭\x1b[0m');
+        this.terminal.writeln('\x1b[31m[-] 杩炴帴宸插叧闂璡x1b[0m');
         const statusText = document.getElementById('status-text');
         if (statusText) statusText.innerHTML = '<span class="w-2 h-2 bg-[#353534] inline-block"></span> STATUS: OFFLINE';
       };
@@ -151,8 +151,8 @@ export class SSHTerminal {
   }
 
   /**
-   * 通过已创建的 WebSocket 连接（用于 one-time-token 模式）
-   * 服务器已通过 token 获取凭据，无需前端发送
+   * 閫氳繃宸插垱寤虹殑 WebSocket 杩炴帴锛堢敤浜?one-time-token 妯″紡锛?
+   * 鏈嶅姟鍣ㄥ凡閫氳繃 token 鑾峰彇鍑嵁锛屾棤闇€鍓嶇鍙戦€?
    */
   connectWithWebSocket(ws: WebSocket): void {
     this.lastConfig = null;
@@ -187,9 +187,9 @@ export class SSHTerminal {
           switch (msg.type) {
             case 'status':
               this.terminal.writeln(`\x1b[32m[*] ${msg.message}\x1b[0m`);
-              if (msg.message === '认证成功') {
+              if (msg.message === '璁よ瘉鎴愬姛') {
                 const statusText = document.getElementById('status-text');
-                if (statusText) statusText.innerHTML = '<span class="w-2 h-2 bg-[#4af626] inline-block animate-pulse"></span> STATUS: ONLINE';
+                if (statusText) statusText.innerHTML = '<span class="w-2 h-2 bg-[#3b82f6] inline-block animate-pulse"></span> STATUS: ONLINE';
               }
               break;
             case 'error':
