@@ -1,6 +1,43 @@
 import { Env, SSHConnectionConfig } from '../types';
 import { SSHSession } from './ssh-session';
 
+function normalizeSSHConfig(config: SSHConnectionConfig): SSHConnectionConfig {
+  let host = String(config.host || '').trim();
+  let port = Number(config.port || 22);
+
+  host = host.replace(/^ssh:\/\//i, '');
+  const atIndex = host.lastIndexOf('@');
+  if (atIndex !== -1) {
+    host = host.slice(atIndex + 1);
+  }
+
+  if (host.startsWith('[')) {
+    const end = host.indexOf(']');
+    if (end !== -1) {
+      const maybePort = host.slice(end + 1).match(/^:(\d+)$/);
+      if (maybePort) port = Number(maybePort[1]);
+      host = host.slice(1, end);
+    }
+  } else {
+    const parts = host.split(':');
+    if (parts.length === 2 && /^\d+$/.test(parts[1])) {
+      host = parts[0];
+      port = Number(parts[1]);
+    }
+  }
+
+  host = host.trim().replace(/\.$/, '');
+
+  if (!host) {
+    throw new Error('SSH host is required');
+  }
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('SSH port must be between 1 and 65535');
+  }
+
+  return { ...config, host, port };
+}
+
 /**
  * SSRF 防护：检测目标主机是否为内网、保留或特殊地址。
  * 覆盖 IPv4 私有段、IPv6 回环/链路本地/私有段、IPv4-mapped IPv6 等。
@@ -159,21 +196,23 @@ export class SSHSessionDO {
     config: SSHConnectionConfig
   ): Promise<void> {
     try {
+      const normalizedConfig = normalizeSSHConfig(config);
+
       // --- SSRF Protection ---
-      if (isBlockedHost(config.host)) {
+      if (isBlockedHost(normalizedConfig.host)) {
         throw new Error('禁止连接内网或保留地址 (SSRF 防护)');
       }
       const BLOCKED_PORTS = [80, 443, 25, 465, 587, 3306, 6379, 27017, 11211];
-      if (BLOCKED_PORTS.includes(config.port)) {
-        throw new Error(`端口 ${config.port} 存在安全风险，已被禁止连接`);
+      if (BLOCKED_PORTS.includes(normalizedConfig.port)) {
+        throw new Error(`端口 ${normalizedConfig.port} 存在安全风险，已被禁止连接`);
       }
 
       const { connect } = await import('cloudflare:sockets');
-      const socket = connect({ hostname: config.host, port: config.port });
+      const socket = connect({ hostname: normalizedConfig.host, port: normalizedConfig.port });
 
       await socket.opened;
 
-      const session = new SSHSession(ws, socket, config, this.env);
+      const session = new SSHSession(ws, socket, normalizedConfig, this.env);
       this.sessions.set(ws, session);
 
       await session.startHandshake();
