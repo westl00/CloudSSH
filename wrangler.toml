@@ -20,7 +20,7 @@ workers_dev = false
 # TURNSTILE_SITEKEY = "your-turnstile-site-key"
 
 [[routes]]
-pattern = "ssh.vps8.gv.uy"
+pattern = "ssh.oooz.kdns.fr"
 custom_domain = true
 
 [[durable_objects.bindings]]
