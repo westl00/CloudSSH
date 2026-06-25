@@ -15,9 +15,9 @@ workers_dev = false
 
 # Turnstile 验证（可选）
 # 在 Cloudflare Dashboard 中创建 Turnstile Widget 后，将密钥配置为环境变量
-# [vars]
- TURNSTILE_SECRET = "0x4AAAAAADq9JnCh0B1n64tCfuwpabLPdzs"
- TURNSTILE_SITEKEY = "0x4AAAAAADq9JiemQQL9k-CN"
+[vars]
+TURNSTILE_SECRET = "0x4AAAAAADq9JnCh0B1n64tCfuwpabLPdzs"
+TURNSTILE_SITEKEY = "0x4AAAAAADq9JiemQQL9k-CN"
 
 [[routes]]
 pattern = "ssh.oooz.kdns.fr"
